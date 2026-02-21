@@ -1,0 +1,10 @@
+target/*
+!target/*.jar
+*.jar
+*.war
+.idea/
+.vscode/
+.git/
+*.log
+.DS_Store
+k8s/
