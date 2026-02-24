@@ -21,6 +21,9 @@ public class User {
     private String email;
     private String phone;
     private String address;
+    private String password;
+    private Boolean enabled;
+    private java.util.List<String> roles;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 

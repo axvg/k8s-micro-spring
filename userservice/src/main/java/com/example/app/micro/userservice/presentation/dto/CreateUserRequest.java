@@ -31,4 +31,9 @@ public class CreateUserRequest {
 
     @Size(max = 255, message = "Address must not exceed 255 characters")
     private String address;
+
+    @NotBlank(message = "Password is required")
+    private String password;
+
+    private java.util.List<String> roles;
 }

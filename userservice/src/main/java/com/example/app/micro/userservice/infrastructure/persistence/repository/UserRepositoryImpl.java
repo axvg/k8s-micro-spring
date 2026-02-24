@@ -2,6 +2,7 @@ package com.example.app.micro.userservice.infrastructure.persistence.repository;
 
 import com.example.app.micro.userservice.domain.model.User;
 import com.example.app.micro.userservice.domain.repository.UserRepository;
+import com.example.app.micro.userservice.infrastructure.persistence.entity.RoleEntity;
 import com.example.app.micro.userservice.infrastructure.persistence.entity.UserEntity;
 import java.util.List;
 import java.util.Optional;
@@ -10,16 +11,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
-/**
- * Implementación del repositorio de Usuario (Adaptador)
- * Conecta el dominio con la infraestructura de persistencia
- */
 @Repository
 @RequiredArgsConstructor
 @Slf4j
 public class UserRepositoryImpl implements UserRepository {
 
     private final JpaUserRepository jpaUserRepository;
+    private final JpaRoleRepository jpaRoleRepository;
 
     @Override
     public List<User> findAll() {
@@ -63,8 +61,6 @@ public class UserRepositoryImpl implements UserRepository {
         return jpaUserRepository.existsByEmail(email);
     }
 
-    // Mappers
-
     private User toDomain(UserEntity entity) {
         return User.builder()
             .id(entity.getId())
@@ -72,18 +68,32 @@ public class UserRepositoryImpl implements UserRepository {
             .email(entity.getEmail())
             .phone(entity.getPhone())
             .address(entity.getAddress())
+            .password(entity.getPassword())
+            .enabled(entity.getEnabled())
+            .roles(entity.getRoles() != null ? entity.getRoles().stream().map(RoleEntity::getName).collect(Collectors.toList()) : java.util.Collections.emptyList())
             .createdAt(entity.getCreatedAt())
             .updatedAt(entity.getUpdatedAt())
             .build();
     }
 
     private UserEntity toEntity(User user) {
+        List<RoleEntity> resolvedRoles = java.util.Collections.emptyList();
+        if (user.getRoles() != null && !user.getRoles().isEmpty()) {
+            resolvedRoles = user.getRoles().stream().map(roleName -> {
+                return jpaRoleRepository.findByName(roleName)
+                    .orElseGet(() -> jpaRoleRepository.save(RoleEntity.builder().name(roleName).build()));
+            }).collect(Collectors.toList());
+        }
+
         return UserEntity.builder()
             .id(user.getId())
             .name(user.getName())
             .email(user.getEmail())
             .phone(user.getPhone())
             .address(user.getAddress())
+            .password(user.getPassword())
+            .enabled(user.getEnabled() != null ? user.getEnabled() : true)
+            .roles(resolvedRoles)
             .createdAt(user.getCreatedAt())
             .updatedAt(user.getUpdatedAt())
             .build();
