@@ -5,7 +5,7 @@ build-container:
 	docker build -t user-service:1.0 .
 
 run-container:
-	docker run -p 8080:8080 user-service:1.0
+	docker run -p 8081:8081 user-service:1.0
 
 kub:
 	kubectl apply -f k8s/configmap.yaml
