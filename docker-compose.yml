@@ -1,0 +1,76 @@
+version: '3.8'
+
+services:
+  userdb:
+    image: postgres:15-alpine
+    container_name: userdb
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: userdb
+    ports:
+      - "5434:5432"
+
+  productdb:
+    image: postgres:15-alpine
+    container_name: productdb
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: productdb
+    ports:
+      - "5433:5432"
+
+  orderdb:
+    image: postgres:15-alpine
+    container_name: orderdb
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: orderdb
+    ports:
+      - "5435:5432"
+    volumes:
+      - ./init-orderdb.sql:/docker-entrypoint-initdb.d/init.sql
+
+  userservice:
+    build: ./userservice
+    container_name: userservice
+    ports:
+      - "8081:8081"
+    environment:
+      - DB_URL=jdbc:postgresql://userdb:5432/userdb
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+    depends_on:
+      - userdb
+
+  productservice:
+    build: ./productservice
+    container_name: productservice
+    ports:
+      - "8082:8081"
+    environment:
+      - DB_URL=jdbc:postgresql://productdb:5432/productdb
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+      - USER_SERVICE_URL=http://userservice:8081
+    depends_on:
+      - productdb
+      - userservice
+
+  orderservice:
+    build: ./orderservice
+    container_name: orderservice
+    ports:
+      - "8083:8083"
+    environment:
+      - DB_URL=jdbc:postgresql://orderdb:5432/orderdb
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+      - PRODUCT_SERVICE_URL=http://productservice:8081
+      - USER_SERVICE_URL=http://userservice:8081
+    depends_on:
+      - orderdb
+      - productservice
+      - userservice
