@@ -6,12 +6,12 @@ spring:
     name: product-service
 
   datasource:
-    url: ${DB_URL}
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
+    url: ${DB_URL:jdbc:postgresql://host.docker.internal:5433/productdb}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
     driver-class-name: org.postgresql.Driver
     hikari:
-      maximum-pool-size: ${POOL_SIZE}
+      maximum-pool-size: ${POOL_SIZE:10}
       minimum-idle: 5
       connection-timeout: 20000
 
@@ -24,8 +24,8 @@ spring:
           lob:
             non_contextual_creation: true
     hibernate:
-      ddl-auto: ${DDL_AUTO}
-    show-sql: ${SHOW_SQL}
+      ddl-auto: ${DDL_AUTO:update}
+    show-sql: ${SHOW_SQL:true}
 
 management:
   endpoints:
@@ -45,8 +45,8 @@ management:
 
 logging:
   level:
-    com.tecsup.app.micro.product: ${LOG_LEVEL}
-    org.hibernate.SQL: ${SQL_LOG_LEVEL}
+    com.tecsup.app.micro.product: ${LOG_LEVEL:INFO}
+    org.hibernate.SQL: ${SQL_LOG_LEVEL:WARN}
 
 user:
   service:
