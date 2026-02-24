@@ -28,6 +28,7 @@ public interface ProductDtoMapper {
      * Convierte Product de dominio a ProductResponse
      */
     @Mapping(target = "available", expression = "java(product.isAvailable())")
+    @Mapping(target = "createdByUser", source = "createdByUser")
     ProductResponse toResponse(Product product);
 
     /**
